@@ -65,6 +65,8 @@ const GlassBottle = ({ texturePath }, ref) => {
   const { nodes, materials } = useGLTF("/models/Rick Coleman.glb");
   const texture = useTexture(texturePath);
 
+  console.log("Loaded nodes:", nodes);
+
   let glassPropsFinal = {
     opacity: 1,
     roughness: 0.28,
@@ -83,19 +85,11 @@ const GlassBottle = ({ texturePath }, ref) => {
 
   return (
     <group ref={ref}>
-      {/* Light source behind texture */}
-      <mesh position={[0, 0.5, 0]}>
-          <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial 
-            map={texture} 
-            toneMapped={false}
-            color={new THREE.Color(1, 1, 1)}
-          />
-        </mesh>
-      
       {Object.keys(nodes).map((key) => {
         const node = nodes[key];
         if (node.isMesh) {
+          const isMiddle = key.toLowerCase().includes('middle') || key === 'Bottle_middle';
+          
           return (
             <mesh
               key={key}
@@ -104,25 +98,45 @@ const GlassBottle = ({ texturePath }, ref) => {
               rotation={node.rotation}
               scale={node.scale}
             >
-              <MeshTransmissionMaterial
-                map={texture}
-                emissive={new THREE.Color(1, 1, 1)}
-                emissiveMap={texture}
-                emissiveIntensity={0.5}
-                background={new THREE.Color('#ffffff')}
-                backside
-                samples={10}
-                resolution={1024}
-                transmission={0.9}
-                roughness={0.28}
-                thickness={0.5}
-                ior={2.5}
-                chromaticAberration={0.03}
-                anisotropy={0.1}
-                distortion={0}
-                distortionScale={0.3}
-                temporalDistortion={0.1}
-              />
+              {isMiddle ? (
+                // Apply uploaded texture to middle section with emissive glow
+                <MeshTransmissionMaterial
+                  map={texture}
+                  emissive={new THREE.Color(1, 1, 1)}
+                  emissiveMap={texture}
+                  emissiveIntensity={0.5}
+                  background={new THREE.Color('#ffffff')}
+                  backside
+                  samples={10}
+                  resolution={1024}
+                  transmission={0.9}
+                  roughness={0.28}
+                  thickness={0.5}
+                  ior={2.5}
+                  chromaticAberration={0.03}
+                  anisotropy={0.1}
+                  distortion={0}
+                  distortionScale={0.3}
+                  temporalDistortion={0.1}
+                />
+              ) : (
+                // Use original material or clear glass for other parts
+                <MeshTransmissionMaterial
+                  background={new THREE.Color('#ffffff')}
+                  backside
+                  samples={10}
+                  resolution={1024}
+                  transmission={0.9}
+                  roughness={0.28}
+                  thickness={0.5}
+                  ior={2.5}
+                  chromaticAberration={0.03}
+                  anisotropy={0.1}
+                  distortion={0}
+                  distortionScale={0.3}
+                  temporalDistortion={0.1}
+                />
+              )}
             </mesh>
           );
         }

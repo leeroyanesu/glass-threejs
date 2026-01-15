@@ -15,7 +15,7 @@ import { useControls } from "leva";
 import * as THREE from "three";
 
 export const Experience = () => {
-  const [currentTexture, setCurrentTexture] = useState("/models/Bottle.png");
+  const [currentTexture, setCurrentTexture] = useState("/models/Blank.png");
   const bottleRef = useRef();
   const controlsRef = useRef();
 
